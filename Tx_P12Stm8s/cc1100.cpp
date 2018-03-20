@@ -22,15 +22,15 @@ static uint8_t cc1100_MSK_250_kb[] = {
                     0x07,  // @PKTCTRL1      Packet Automation Control
                     0x05,  // @PKTCTRL0      Packet Automation Control
                     0x00,  // @ADDR          Device Address
-                    0x01,  // @CHANNR        Channel Number
+                    0x96,  // @CHANNR        Channel Number
                     0x06,  // @FSCTRL1       Frequency Synthesizer Control
                     0x00,  // FSCTRL0       Frequency Synthesizer Control
-                    0x10,  // @FREQ2         Frequency Control Word, High Byte
-                    0xA7,  // @FREQ1         Frequency Control Word, Middle Byte
-                    0x62,  // @FREQ0         Frequency Control Word, Low Byte
-                    0x2D,  // MDMCFG4       Modem Configuration
-                    0x3B,  // MDMCFG3       Modem Configuration
-                    0x73,  // MDMCFG2       Modem Configuration
+                    0x0F,  // @FREQ2         Frequency Control Word, High Byte
+                    0x62,  // @FREQ1         Frequency Control Word, Middle Byte
+                    0x76,  // @FREQ0         Frequency Control Word, Low Byte
+                    0xF6,  // MDMCFG4       Modem Configuration
+                    0x43,  // MDMCFG3       Modem Configuration
+                    0x13,  // MDMCFG2       Modem Configuration
                     0x72,  // @MDMCFG1       Modem Configuration
                     0xF8,  // MDMCFG0       Modem Configuration
                     0x15,  // @DEVIATN       Modem Deviation Setting
@@ -164,7 +164,7 @@ uint8_t CC1100::begin(volatile uint8_t &My_addr)
     //set modulation mode
     set_mode(0x04);
     set_ISM(0x02);
-    setSyncWord( 0x8799 ); 
+    setSyncWord( 0x8799 );
     spi_write_register(MDMCFG1, 0x72);
     /*
     //set channel
@@ -684,9 +684,9 @@ void CC1100::set_ISM(uint8_t ism_freq)
                     memcpy(Patable,patable_power_315,8);
                     break;
         case 0x02:                                                          //433 MHz
-                    freq2=0x10;
-                    freq1=0xA7;
-                    freq0=0x62;
+                    freq2=0x0F;
+                    freq1=0x62;
+                    freq0=0x76;
                     memcpy(Patable,patable_power_433,8);
                     break;
         case 0x03:                                                          //868MHz
@@ -1049,7 +1049,7 @@ void CC1100::spi_write_burst(uint8_t spi_instr, uint8_t *pArr, uint8_t length)
 void CC1100::setSyncWord( uint16_t Sync )
 {
     spi_write_register( SYNC1, 0xFF & ( Sync >> 8 ) );
-    spi_write_register( SYNC0, 0xFF & Sync );   //Ğ´ÈëÍ¬²½×Ö¶Î 16Bit
+    spi_write_register( SYNC0, 0xFF & Sync );   //å†™å…¥åŒæ­¥å­—æ®µ 16Bit
 }
 
 //|=========================== UART helper ====================================|
