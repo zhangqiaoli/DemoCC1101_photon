@@ -11,7 +11,7 @@
 #include "application.h"
 #include "cc1100.h"
 
-static uint8_t cc1100_MSK_250_kb[] = {
+static uint8_t cc1100_GFSK_2_kb[] = {
                     0x07,  // @IOCFG2        GDO2 Output Pin Configuration
                     0x2E,  // IOCFG1        GDO1 Output Pin Configuration
                     0x80,  // @IOCFG0        GDO0 Output Pin Configuration
@@ -117,7 +117,7 @@ uint8_t CC1100::get_debug_level(void)
 //-----------------------------[end]--------------------------------------------
 
 //----------------------[CC1100 init functions]---------------------------------
-uint8_t CC1100::begin(volatile uint8_t &My_addr)
+uint8_t CC1100::begin()
 {
     uint8_t cc1100_freq_select, cc1100_mode_select, cc1100_channel_select;
     uint8_t partnum, version;
@@ -376,6 +376,7 @@ uint8_t CC1100::rx_payload_burst(uint8_t rxbuffer[], uint8_t &pktlen)
     {
         spi_read_burst(RXFIFO_BURST, rxbuffer, bytes_in_RXFIFO);
         pktlen = rxbuffer[0];
+        Serial.printlnf("recv %d",pktlen);
         res = TRUE;
     }
     else
@@ -418,7 +419,6 @@ uint8_t CC1100::sent_packet(uint8_t my_addr, uint8_t rx_addr, uint8_t *txbuffer,
         if(rx_addr == BROADCAST_ADDRESS){                       //no wait acknowledge if sent to broadcast address or tx_retries = 0
             return TRUE;                                        //successful sent to BROADCAST_ADDRESS
         }
-
         while (ackWaitCounter < ACK_TIMEOUT )                   //wait for an acknowledge
         {
             if (packet_available() == TRUE)                     //if RF package received check package acknowge
@@ -442,7 +442,7 @@ uint8_t CC1100::sent_packet(uint8_t my_addr, uint8_t rx_addr, uint8_t *txbuffer,
             Serial.print(F(" #:"));
             uart_puthex_byte(tx_retries_count-1);
             Serial.println();
-      }
+        }
     }while(tx_retries_count <= tx_retries);                     //while count of retries is reaches
 
     return FALSE;                                               //sent failed. too many retries
@@ -559,7 +559,7 @@ uint8_t CC1100::check_acknolage(uint8_t *rxbuffer, uint8_t pktlen, uint8_t sende
 {
     int8_t rssi_dbm;
     uint8_t crc, lqi;
-
+    Serial.printlnf("RECV ACK,my=%d,sender=%d,1=%d,2=%d,3=%d,4=%d,5=%d",my_addr,sender,rxbuffer[1],rxbuffer[2],rxbuffer[3],rxbuffer[4],rxbuffer[5]);
     if((pktlen == 0x05 && \
        (rxbuffer[1] == my_addr || rxbuffer[1] == BROADCAST_ADDRESS)) && \
         rxbuffer[2] == sender && \
@@ -650,7 +650,7 @@ void CC1100::set_mode(uint8_t mode)
                     memcpy(Cfg_reg,cc1100_GFSK_100_kb,CFG_REGISTER);   //sets up settings for GFSK 100 kbit mode/speed
                     break;*/
         case 0x04:
-                    memcpy(Cfg_reg,cc1100_MSK_250_kb,CFG_REGISTER);    //sets up settings for GFSK 38,4 kbit mode/speed
+                    memcpy(Cfg_reg,cc1100_GFSK_2_kb,CFG_REGISTER);    //sets up settings for GFSK 38,4 kbit mode/speed
                     break;
         /*case 0x05:
                     memcpy(Cfg_reg,cc1100_MSK_500_kb,CFG_REGISTER);    //sets up settings for GFSK 38,4 kbit mode/speed
@@ -659,7 +659,7 @@ void CC1100::set_mode(uint8_t mode)
                     memcpy(Cfg_reg,cc1100_OOK_4_8_kb,CFG_REGISTER);    //sets up settings for GFSK 38,4 kbit mode/speed
                     break;*/
         default:
-                    memcpy(Cfg_reg,cc1100_MSK_250_kb,CFG_REGISTER);  //sets up settings for GFSK 38,4 kbit mode/speed
+                    memcpy(Cfg_reg,cc1100_GFSK_2_kb,CFG_REGISTER);  //sets up settings for GFSK 38,4 kbit mode/speed
                     mode = 0x04;
                     break;
     }

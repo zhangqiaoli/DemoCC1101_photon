@@ -39,7 +39,7 @@ void setup()
   Serial.begin(115200);Serial.println();
 
   // init CC1101 RF-module and get My_address from EEPROM
-  cc1100.begin(My_addr);                   //inits RF module with main default settings
+  cc1100.begin();                   //inits RF module with main default settings
 
   cc1100.sidle();                          //set to ILDE first
   //cc1100.set_channel(0x01);                //set channel
@@ -64,7 +64,7 @@ void loop()
   // one second update timer
   if (millis() - prev_millis_1s_timer >= INTERVAL_1S_TIMER)
   {
-    Rx_addr = 0x00;
+    Rx_addr = 0x05;
     ++senderindex;
     senderindex = senderindex%10;
     uint32_t time_stamp = millis();                              //generate time stamp
@@ -78,7 +78,7 @@ void loop()
     Pktlen = strlen(message)  + 1 + 3;                                               //set packet len to 0x13
 
     detachInterrupt(GDO2INT);                              //disable pin change interrupt
-    cc1100.sent_packet(My_addr, Rx_addr, Tx_fifo, Pktlen, 40);   //sents package over air. ACK is received via GPIO polling
+    cc1100.sent_packet(1, Rx_addr, Tx_fifo, Pktlen, 40);   //sents package over air. ACK is received via GPIO polling
     attachInterrupt(GDO2INT, rf_available_int, RISING);    //enable pin change interrupt*/
 
     Serial.print("tx_time: ");Serial.print(millis()-time_stamp);Serial.println("ms");

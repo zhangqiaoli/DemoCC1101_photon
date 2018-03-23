@@ -143,7 +143,7 @@ class CC1100
         uint8_t set_debug_level(uint8_t set_debug_level);
         uint8_t get_debug_level(void);
 
-        uint8_t begin(volatile uint8_t &My_addr);
+        uint8_t begin();
         void end(void);
 
         void spi_write_strobe(uint8_t spi_instr);
